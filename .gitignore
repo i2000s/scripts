@@ -1,0 +1,13 @@
+#Not tracked folders and files
+Temp
+
+#TempFiles.
+*.aux
+*.ilg
+*.log
+*.synctex.gz
+*.out
+*.blg
+*.dvi
+*.bak
+*~
