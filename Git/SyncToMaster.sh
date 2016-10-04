@@ -1,67 +1,53 @@
 #!Bash
-echo "Synchronizing master from origin. It will stop if there is any uncommitted changes in the master branch locally."
+# This script merges changes from distributed branches to the main branch and run the Makefile on the main branch.
+# This script should be put in the main branch folder with the main branch checked out, and all distributed branches should be put in the subfolders named after the branch names.
+# Define configuration variables. This should be the only part to adapt to particular cases.
+# The name of the remote is called origin by default. If not, you need to modify the code.
+mainBranch="master" # The branch to merge changes to.
+distributedBranch="Ivan Ezad" # The branches to be merged from. The source should be put in the folders named after the distributed branch's names.
+
+# Synchronize the main branch from remote. It is recommmended to set remote with username or using ssh without typing in password every time git pushes.
+echo "Synchronizing $mainBranch from origin. It will stop if there is any uncommitted changes in the $mainBranch branch locally."
 if ! git diff-index --quiet HEAD --; then
-    echo "Master has uncommitted changes. Check it out."
+    echo "The local $mainBranch branch has uncommitted changes. Check it out."
     git status
     exit 0
 fi
 git fetch origin
-git merge origin/master
-git push origin master
+git merge origin/$mainBranch
+git push origin $mainBranch
 
-echo "Updating Ivan branch to master."
-cd Ivan
-git fetch origin
-if ! git diff-index --quiet HEAD --; then
-    echo "Update changes from Ivan branch."
-    git add -u .
-    git commit -m "Update from Ivan."
-    git merge origin/Ivan
-    git push origin Ivan
-    cd ..
-    echo "Merge changes from Ivan branch to master branch."
-    git fetch origin
-    git checkout master
-    git merge origin/Ivan
-    git push origin master
-    cd Ivan
-else
-    git push origin Ivan
-    cd ..
-    git fetch origin
-    git checkout master
-    git merge origin/Ivan
-    git push origin master
-    cd Ivan
-fi
-cd ..
+# Updating distributed branches to the main branch.
+for distrb in $distributedBranch
+do
+  echo "Updating $distrb branch to master."
+  cd $distrb
+  git fetch origin
+  if ! git diff-index --quiet HEAD --; then
+      echo "Update changes from $distrb branch."
+      git add -u .
+      git commit -m "Update from $distrb."
+      git merge origin/$distrib
+      git push origin $distrb
+      cd ..
+      echo "Merge changes from $distrb branch to master branch."
+      git fetch origin
+      git checkout $mainBranch
+      git merge origin/$distrb
+      git push origin $mainbranch
+      cd $distrb
+  else
+      git push origin $distrb
+      cd ..
+      git fetch origin
+      git checkout $mainBranch
+      git merge origin/$distrb
+      git push origin $mainBranch
+      cd $distrb
+  fi
+  cd ..
+done
 
-echo "Updating Ezad branch to master."
-cd Ezad
-git fetch origin
-if ! git diff-index --quiet HEAD --; then
-    echo "Update changes from Ezad branch."
-    git add -u .
-    git commit -m "Update from Ezad."
-    git merge origin/Ezad
-    git push origin Ezad
-    cd ..
-    echo "Merge changes from Ezad branch to master branch."
-    git fetch origin
-    git checkout master
-    git merge origin/Ezad
-    git push origin master
-    cd Ezad
-else
-    git push origin Ezad
-    cd ..
-    git fetch origin
-    git checkout master
-    git merge origin/Ezad
-    git push origin master
-    cd Ezad
-fi
-cd ..
 make && make clean
 echo " Finished compiling pdf."
 echo " "

@@ -1,61 +1,43 @@
 #!Bash
-echo "Synchronizing master from origin. It will stop if master brach has uncommitted changes locally."
-if ! git diff-index --quiet HEAD --; then
-    echo "Master has uncommitted changes. Check it out manually."
-    git status
-    exit 0
-fi
-git fetch origin
-git checkout master
-git merge origin/master
-git push origin master
+# This script merges changes from the main branch to distributed branches and run the Makefile on those distributed branches.
+# This script should be put in the main branch folder with the main branch checked out, and all distributed branches should be put in the subfolders named after the branch names.
+# Define configuration variables. This should be the only part to adapt to particular cases.
+# The name of the remote is called origin by default. If not, you need to modify the code.
+mainBranch="master" # The branch to merge changes from.
+distributedBranch="Ivan Ezad twocolumn" # The target branches to be merged into. The source should be put in the folders named after the distributed branch's names.
 
-echo "Synchronizing Ivan branch from master."
-cd Ivan
-git fetch origin
+# Synchronize the main branch from remote. It is recommmended to set remote with username or using ssh without typing in password every time git pushes.
+echo "Synchronizing $mainBranch branch from origin. It will stop if the $mainBranch branch has uncommitted changes locally."
 if ! git diff-index --quiet HEAD --; then
-    echo "Ivan branch has been changed locally. Check it out."
+    echo "The local $mainBranch branch has uncommitted changes. Check it out manually."
     git status
     exit 0
-else
-    git checkout Ivan
-    git merge origin/master
-    git push origin Ivan
-    make && make clean
-    echo " Finished compiling pdf."
-    cd ..
 fi
 
-echo "Synchronizing Ezad branch from master."
-cd Ezad
 git fetch origin
-if ! git diff-index --quiet HEAD --; then
-    echo "Ezad branch has been changed locally. Check it out."
-    git status
-    exit 0
-else
-    git checkout Ezad
-    git merge origin/master
-    git push origin Ezad
-    make && make clean
-    echo " Finished compiling pdf."
-    cd ..
-fi
+git checkout $mainBranch
+git merge origin/$mainBranch
+git push origin $mainBranch
 
-echo "Synchronizing twocolumn branch from master."
-cd twocolumn
-git fetch origin
-if ! git diff-index --quiet HEAD --; then
-    echo "twocolumn branch has been changed locally. Check it out."
-    git status
-    exit 0
-else
-    git checkout twocolumn
-    git merge origin/master
-    git push origin twocolumn
-    make && make clean
-    echo " Finished compiling pdf."
-    cd ..
-fi
+# Merge main branch to distributed branches.
+for distrb in $distributedBranch
+do
+  echo "Synchronizing $distrb branch from $mainBranch."
+  cd $distrb
+  git fetch origin
+  if ! git diff-index --quiet HEAD --; then
+      echo "$distrb branch has been changed locally. Check it out."
+      git status
+      exit 0
+  else
+      git checkout $distrb
+      git merge origin/$mainBranch
+      git push origin $distrb
+      make && make clean
+      echo " Finished compiling pdf in folder $distrb."
+      cd ..
+  fi
+done
+
 echo " "
 echo "Done."
