@@ -20,7 +20,7 @@ git push origin $mainBranch
 # Updating distributed branches to the main branch.
 for distrb in $distributedBranch
 do
-  echo "Updating $distrb branch to master."
+  echo "Updating $distrb branch to $mainBranch."
   cd $distrb
   git fetch origin
   if ! git diff-index --quiet HEAD --; then
@@ -30,7 +30,7 @@ do
       git merge origin/$distrib
       git push origin $distrb
       cd ..
-      echo "Merge changes from $distrb branch to master branch."
+      echo "Merge changes from $distrb branch to $mainBranch branch."
       git fetch origin
       git checkout $mainBranch
       git merge origin/$distrb
