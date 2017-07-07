@@ -15,6 +15,7 @@ if ! git diff-index --quiet HEAD --; then
 fi
 git fetch origin
 git merge origin/$mainBranch
+git submodule update
 git push origin $mainBranch
 
 # Updating distributed branches to the main branch.
@@ -28,12 +29,14 @@ do
       git add -u .
       git commit -m "Update from $distrb."
       git merge origin/$distrib
+      git submodule update
       git push origin $distrb
       cd ..
       echo "Merge changes from $distrb branch to $mainBranch branch."
       git fetch origin
       git checkout $mainBranch
       git merge origin/$distrb
+      git submodule update
       git push origin $mainbranch
       cd $distrb
   else
@@ -42,6 +45,7 @@ do
       git fetch origin
       git checkout $mainBranch
       git merge origin/$distrb
+      git submodule update
       git push origin $mainBranch
       cd $distrb
   fi

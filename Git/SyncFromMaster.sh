@@ -17,6 +17,7 @@ fi
 git fetch origin
 git checkout $mainBranch
 git merge origin/$mainBranch
+git submodule update
 git push origin $mainBranch
 
 # Merge main branch to distributed branches.
@@ -32,6 +33,7 @@ do
   else
       git checkout $distrb
       git merge origin/$mainBranch
+      git submodule update
       git push origin $distrb
       make && make clean
       echo " Finished compiling pdf in folder $distrb."
