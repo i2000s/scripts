@@ -28,6 +28,18 @@ do
   fi
 done
 git submodule update --recursive --remote
+# Determine if the merge is in-progress because of potential conflicts.
+git merge HEAD &> /dev/null
+result=$?
+if [ $result -ne 0 ]
+then
+    git status
+    echo "Merge to master folder in progress. There may be potential conflicts."
+    echo " Please fix them in the submodule folder(s) before further processing. Program aborted."
+    exit 0
+else
+    echo "Remote update was finished peacefully."
+fi
 
 # Updating submodules in the distributed branches from the remote.
 echo "Checking submodules in distributed branches."
@@ -51,6 +63,18 @@ do
     fi
   done
   git submodule update --recursive --remote
+  # Determine if the merge is in-progress because of potential conflicts.
+  git merge HEAD &> /dev/null
+  result=$?
+  if [ $result -ne 0 ]
+  then
+      git status
+      echo "Merge to $distrb in progress. There may be potential conflicts."
+      echo " Please fix them in the $distrb folder with submodule(s) before further processing. Program aborted."
+      exit 0
+  else
+      echo "Submodule update in $distrb was finished peacefully."
+  fi
   cd ..
 done
 

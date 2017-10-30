@@ -34,6 +34,18 @@ do
       git checkout $distrb
       git merge origin/$mainBranch
       git submodule update
+      # Determine if the merge is in-progress because of potential conflicts.
+      git merge HEAD &> /dev/null
+      result=$?
+      if [ $result -ne 0 ]
+      then
+          git status
+          echo "Merge to the $distrb branch in progress. There may be potential conflicts."
+          echo " Please fix them in the $distrb folder before further processing. Program aborted."
+          exit 0
+      else
+          echo "Merge to $distrb was finished peacefully."
+      fi
       git push origin $distrb
       make && make clean
       echo " Finished compiling pdf in folder $distrb."

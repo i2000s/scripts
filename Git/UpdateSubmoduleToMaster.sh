@@ -1,6 +1,6 @@
 #!Bash
 # This script merges changes from the submodules of distributed branches to the remote and then fetch to the main branch for all changes in distributed branches.
-# It will stop if any submodule has been changed locally for manual reviews and fixes.
+# It will stop if any submodule has been changed local for manual reviews and fixes.
 # After the manual fixes, this script can be ran iteratively to make sure the main branch has the most updated submodule hash merged.
 # This script should be put in the main branch folder with the main branch checked out, and all distributed branches should be put in the subfolders named after the branch names.
 # Define configuration variables. This should be the only part to adapt to particular cases.
@@ -54,6 +54,18 @@ do
 done
 
 git submodule update --recursive --remote --merge
+# Determine if the merge is in-progress because of potential conflicts.
+git merge HEAD &> /dev/null
+result=$?
+if [ $result -ne 0 ]
+then
+    git status
+    echo "Merge in progress. There may be potential conflicts."
+    echo " Please fix them in the target folder before further processing. Program aborted."
+    exit 0
+else
+    echo "Merge was finished peacefully."
+fi
 git push --recurse-submodules=on-demand origin $mainBranch
 
 echo " The $mainBranch now has the latest SHA recorded for all submodules."
